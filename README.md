@@ -23,7 +23,7 @@
 1. Clone專案：
 
 ```bash
-git clone https://git.evo-techlab.com/wensheng/WorkTracker.git
+git clone https://github.com/WenSheng31/WorkTracker.git
 cd WorkTracker
 ```
 
