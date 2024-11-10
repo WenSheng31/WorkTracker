@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block content %}
+    <!-- 月份切換和統計 -->
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                <div class="btn-group">
+                    <a href="{{ url_for('index', year=prev_year, month=prev_month) }}"
+                       class="btn btn-outline-primary">&lt; 上個月</a>
+                    <button class="btn btn-primary">{{ year }}年 {{ month }}月</button>
+                    <a href="{{ url_for('index', year=next_year, month=next_month) }}"
+                       class="btn btn-outline-primary">下個月 &gt;</a>
+                </div>
+                <div class="text-center text-md-end">
+                    <div class="text-muted mb-1">工時：{{ "%.1f"|format(total_hours) }} 小時</div>
+                    <div class="stats-number">薪資：NT$ {{ "{:,.0f}".format(total_salary) }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增工時 -->
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title mb-3">新增工時</h5>
+            <form method="POST" action="{{ url_for('add_hours') }}">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="date" class="form-label">日期</label>
+                        <input type="date" class="form-control" id="date" name="date" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="start_time" class="form-label">開始時間</label>
+                        <input type="time" class="form-control" id="start_time" name="start_time" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="end_time" class="form-label">結束時間</label>
+                        <input type="time" class="form-control" id="end_time" name="end_time" required>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">新增記錄</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 工時記錄列表 -->
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title mb-3">工時記錄</h5>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                    <tr class="text-center">
+                        <th>日期</th>
+                        <th>時間</th>
+                        <th>工時</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for record in work_hours %}
+                        <tr class="text-center">
+                            <td>{{ record.date.strftime('%m/%d') }}</td>
+                            <td>{{ record.start_time.strftime('%H:%M') }}-{{ record.end_time.strftime('%H:%M') }}</td>
+                            <td>{{ "%.1f"|format(record.hours) }}h</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('edit_hours', id=record.id) }}"
+                                       class="btn btn-outline-primary btn-sm">編輯</a>
+                                    <form action="{{ url_for('delete_hours', id=record.id) }}"
+                                          method="POST"
+                                          class="d-inline-block"
+                                          onsubmit="return confirm('確定要刪除這筆記錄嗎？');">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">刪除</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">
+                                本月尚無工時記錄
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 自動填入今天日期
+            document.getElementById('date').valueAsDate = new Date();
+        });
+    </script>
+{% endblock %}
